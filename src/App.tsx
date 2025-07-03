@@ -1,4 +1,5 @@
 import './App.css'
+import Chat from './layouts/Chat'
 import Home from './pages/Home'
 
 function App() {
@@ -6,7 +7,7 @@ function App() {
   return (
     <>
       <div>
-        <Home />
+        <Chat />
       </div>  
     </>
   )
