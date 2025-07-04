@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const Chat = () => {
+const ConversationView = () => {
 
     const [message, setMessage] = useState<string>('');
     const [response, setResponse] = useState<any>("");
@@ -33,13 +33,15 @@ const Chat = () => {
     }, [message])
 
     return (
-        <>
+        <div>
             <div>Chat</div>
-            <input className="border-2 h-20 w-100" type="text" onChange={(e)=>setMessage(e.target.value)} placeholder="Type your message here..." />
-            <button onClick={sendMessage}>Send</button>
             <textarea className="border-2 h-20 w-100" value={response.message} placeholder="Chat messages will appear here..."></textarea>
-        </>
+            <div className="flex flex-row border-2">
+                <input className="border-2 h-20 w-100" type="text" onChange={(e) => setMessage(e.target.value)} placeholder="Type your message here..." />
+                <button className="bg-green round-lg" onClick={sendMessage}>Send</button>
+            </div>
+        </div>
     )
 }
 
-export default Chat
+export default ConversationView
