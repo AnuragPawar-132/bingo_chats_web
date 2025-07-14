@@ -5,9 +5,30 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e:any) => {
+    const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(e)
+        console.log(email, password);
+        let body = {
+            email: email,
+            password: password
+        }
+        requestLogin(body)
+    }
+
+    const requestLogin = async (body: any) => {
+        try {
+            const result = await fetch('http://localhost:8080/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            })
+            console.log("result", result.status);
+        }
+        catch (err) {
+            console.log("err", err);
+        }
     }
 
     return (
@@ -15,7 +36,7 @@ const Login = () => {
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Login</h2>
 
-                <form className="space-y-5" onSubmit={(value)=>handleLogin(value)}>
+                <form className="space-y-5" onSubmit={handleLogin}>
                     <div>
                         <label className="block text-gray-700 font-medium mb-2">Email</label>
                         <input
