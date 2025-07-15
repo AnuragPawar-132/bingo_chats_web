@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -17,14 +19,21 @@ const Login = () => {
 
     const requestLogin = async (body: any) => {
         try {
-            const result = await fetch('http://localhost:8080/auth/login', {
+            const response = await fetch('http://localhost:8080/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(body),
             })
-            console.log("result", result.status);
+            if (!response.ok) {
+                console.log("HTTP Error:", response.status);
+                return;
+            }
+            const result = await response.json();
+            console.log("result", result);
+            localStorage.setItem("user",JSON.stringify(result.user));
+            navigate('/chat')
         }
         catch (err) {
             console.log("err", err);

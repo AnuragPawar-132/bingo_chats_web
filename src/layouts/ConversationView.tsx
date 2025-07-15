@@ -4,11 +4,13 @@ const ConversationView = () => {
 
     const [message, setMessage] = useState<string>('');
     const [response, setResponse] = useState<any>("");
+    const [userId, setUserId] = useState<any>("");
 
     const ws = new WebSocket('ws://localhost:8080');
 
     ws.onopen = () => {
-        ws.send(JSON.stringify({ type: 'register', user_id: 1 }));
+        
+        ws.send(JSON.stringify({ type: 'register', user_id: userId }));
     };
 
     ws.onmessage = (event) => {
@@ -19,17 +21,24 @@ const ConversationView = () => {
 
     const sendMessage = () => {
         console.log("in sendMessage fun");
-        let details = JSON.parse(localStorage.getItem('chat_users') || '{}');
-        console.log("localStorage", details);
         ws.send(JSON.stringify({
-            sender_id: details.sender_id,
-            receiver_id: details.receiver_id,
+            sender_id: userId,
+            receiver_id: 2,
             message: message
         }));
     }
 
-    useEffect(() => {
+    const setLoggedUser = () => {
+        let user = localStorage.getItem('user');
+        let user_id: number | undefined;
+        if(user){
+            user_id = JSON.parse(user)?.id;
+        }
+        setUserId(user_id)
+    }
 
+    useEffect(() => {
+        setLoggedUser()
     }, [message])
 
     return (

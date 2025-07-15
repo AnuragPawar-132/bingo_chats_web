@@ -1,10 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 const ConversationList = () => {
+
+  const [loggedUser, setLoggedUser] = useState<string | undefined>("");
+
+  const getLoggedUser = () => {
+      let user = localStorage.getItem('user');
+        let userName: string | undefined;
+        if(user){
+            userName = JSON.parse(user)?.username;
+        }
+        setLoggedUser(userName)
+  }
+    
+  useEffect(()=>{
+    getLoggedUser()
+  }, [])
   return (
     <div className="h-screen bg-white border-r border-gray-300 overflow-y-auto">
       <div className="p-4 font-bold text-gray-700 border-b border-gray-200">
-        Bingo Chat
+        {loggedUser}
       </div>
 
       {/* Example conversation items */}
