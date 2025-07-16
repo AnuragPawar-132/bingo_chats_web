@@ -23,7 +23,7 @@ const ConversationView = () => {
         console.log("in sendMessage fun");
         ws.send(JSON.stringify({
             sender_id: userId,
-            receiver_id: 2,
+            receiver_id: 1,
             message: message
         }));
     }
