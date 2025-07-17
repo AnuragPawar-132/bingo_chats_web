@@ -1,11 +1,15 @@
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { login, logout } from '../slices/authSlice';
 
 const Login = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const myUser = useSelector((state: any) => state.loggedUser);
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -15,6 +19,7 @@ const Login = () => {
             password: password
         }
         requestLogin(body)
+        console.log("my user .........", myUser);
     }
 
     const requestLogin = async (body: any) => {
@@ -33,6 +38,7 @@ const Login = () => {
             const result = await response.json();
             console.log("result", result);
             localStorage.setItem("user",JSON.stringify(result.user));
+            dispatch(login(result.user))
             navigate('/chat')
         }
         catch (err) {
