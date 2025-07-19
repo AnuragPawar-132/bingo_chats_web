@@ -29,7 +29,7 @@ const ConversationView = () => {
     }
 
     const setLoggedUser = () => {
-        let user = localStorage.getItem('user');
+        let user = localStorage.getItem('bng_user');
         let user_id: number | undefined;
         if(user){
             user_id = JSON.parse(user)?.id;

@@ -1,37 +1,48 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const ConversationList = () => {
 
-  const [loggedUser, setLoggedUser] = useState<string | undefined>("");
+  const myUser = useSelector((state: any) => state.loggedUser);
+  const token = localStorage.getItem("bng_token");
+  const [users, setUsers] = useState<any>([]);
 
-  const getLoggedUser = () => {
-      let user = localStorage.getItem('user');
-        let userName: string | undefined;
-        if(user){
-            userName = JSON.parse(user)?.username;
+  const fetchUsers = async () => {
+    try{
+      const response = await fetch("http://localhost:8080/api/users", {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-        setLoggedUser(userName)
-  }
-    
+      })
+      if (!response.ok) {
+                console.log("HTTP Error:", response.status);
+                return;
+      }
+       const result = await response.json();
+      setUsers(result);
+    }catch(err){
+      console.log('error in fetching users', err);
+    }
+  } 
+
   useEffect(()=>{
-    getLoggedUser()
+    fetchUsers()
   }, [])
+    
   return (
     <div className="h-screen bg-white border-r border-gray-300 overflow-y-auto">
       <div className="p-4 font-bold text-gray-700 border-b border-gray-200">
-        {loggedUser}
+        {myUser?.username}
       </div>
 
       {/* Example conversation items */}
-      <div className="hover:bg-gray-100 cursor-pointer px-4 py-3 border-b border-gray-200">
-        Alice
+      {users.map((ele:any, index:number)=>{
+        return <div key={index} className="hover:bg-gray-100 cursor-pointer px-4 py-3 border-b border-gray-200">
+        {ele.username}
       </div>
-      <div className="hover:bg-gray-100 cursor-pointer px-4 py-3 border-b border-gray-200">
-        Bob
-      </div>
-      <div className="hover:bg-gray-100 cursor-pointer px-4 py-3 border-b border-gray-200">
-        Charlie
-      </div>
+      })}
     </div>
 
   )

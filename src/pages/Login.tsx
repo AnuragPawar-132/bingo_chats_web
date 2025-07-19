@@ -8,18 +8,17 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const myUser = useSelector((state: any) => state.loggedUser);
+    // const dispatch = useDispatch();
+    // const myUser = useSelector((state: any) => state.loggedUser);
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(email, password);
         let body = {
             email: email,
             password: password
         }
         requestLogin(body)
-        console.log("my user .........", myUser);
+        // console.log("my user .........", myUser);
     }
 
     const requestLogin = async (body: any) => {
@@ -36,9 +35,9 @@ const Login = () => {
                 return;
             }
             const result = await response.json();
-            console.log("result", result);
-            localStorage.setItem("user",JSON.stringify(result.user));
-            dispatch(login(result.user))
+            localStorage.setItem("bng_user",JSON.stringify(result.user));
+            localStorage.setItem("bng_token",result.accessToken);
+            // dispatch(login(result.user))
             navigate('/chat')
         }
         catch (err) {
