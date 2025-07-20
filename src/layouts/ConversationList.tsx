@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { chooseFriend } from '../slices/chatSlice';
+import { Search } from 'lucide-react';
 
 const ConversationList = () => {
 
-  const myUser = useSelector((state: any) => state.loggedUser);
+  const myUser = useSelector((state: any) => state.auth.loggedUser);
+  const dispatch = useDispatch();
   const token = localStorage.getItem("bng_token");
   const [users, setUsers] = useState<any>([]);
 
@@ -27,25 +30,55 @@ const ConversationList = () => {
     }
   } 
 
+  const selectFriend = (friend: any) => {
+    dispatch(chooseFriend(friend));
+  }
+
   useEffect(()=>{
     fetchUsers()
   }, [])
     
   return (
-    <div className="h-screen bg-white border-r border-gray-300 overflow-y-auto">
-      <div className="p-4 font-bold text-gray-700 border-b border-gray-200">
-        {myUser?.username}
+    <div className="w-80 h-screen bg-white border-r border-gray-300 flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-300 flex items-center justify-between">
+        <h1 className="text-lg font-semibold">BingoChats</h1>
       </div>
 
-      {/* Example conversation items */}
-      {users.map((ele:any, index:number)=>{
-        return <div key={index} className="hover:bg-gray-100 cursor-pointer px-4 py-3 border-b border-gray-200">
-        {ele.username}
+      {/* Search */}
+      <div className="p-3 border-b border-gray-200">
+        <div className="flex items-center bg-gray-100 px-3 py-2 rounded-lg">
+          <Search className="w-4 h-4 text-gray-500 mr-2" />
+          <input
+            type="text"
+            placeholder="Search or start new chat"
+            className="bg-transparent outline-none w-full text-sm"
+          />
+        </div>
       </div>
-      })}
+
+      {/* Chat List */}
+      <div className="flex-1 overflow-y-auto">
+        {users.map((conv: any) => (
+          <div
+            key={conv.id}
+            onClick={()=>selectFriend(conv)} 
+            className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+          >
+            <img
+              src={conv.avatar_url}
+              alt={conv.username}
+              className="w-10 h-10 rounded-full mr-3"
+            />
+            <div>
+              <h2 className="text-sm font-semibold">{conv.username}</h2>
+              <p className="text-xs text-gray-500 truncate w-48">{conv.lastMessage}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
-
-  )
+  );
 }
 
 export default ConversationList

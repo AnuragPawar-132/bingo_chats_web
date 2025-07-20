@@ -18,7 +18,7 @@ const AppRoutes = () => {
     if (user && token) {
       try {
         const decoded: any = jwtDecode(token);
-        const isExpired = decoded.exp * 1000 < Date.now(); // exp is in seconds
+        const isExpired = decoded.exp * 1000 < Date.now();
 
         if (isExpired) {
           localStorage.clear();

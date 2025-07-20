@@ -9,7 +9,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
     // const dispatch = useDispatch();
-    // const myUser = useSelector((state: any) => state.loggedUser);
+    // const myUser = useSelector((state: any) => state.auth.loggedUser);
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
