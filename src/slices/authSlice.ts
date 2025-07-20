@@ -19,7 +19,7 @@ export const authSlice = createSlice({
             state.loggedUser.email = action.payload.email;
             // state.loggedUser.token = action.payload.token;
         },
-        logout: (state, action)=> {
+        logout: (state)=> {
             state.loggedUser.id = null;
             state.loggedUser.username = "";
             state.loggedUser.email = "";
