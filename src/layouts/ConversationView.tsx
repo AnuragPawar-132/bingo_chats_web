@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MoreVertical } from "lucide-react"; 
+import { MoreVertical } from "lucide-react";
 import { useSelector } from "react-redux";
 
 const ConversationView = () => {
@@ -7,7 +7,7 @@ const ConversationView = () => {
     const [message, setMessage] = useState<string>('');
     const [response, setResponse] = useState<any>("");
     const [userId, setUserId] = useState<any>("");
-    const friend = useSelector((state: any)=> state.chat.selectedFriend);
+    const friend = useSelector((state: any) => state.chat.selectedFriend);
 
     const ws = new WebSocket('ws://localhost:8080');
 
@@ -33,7 +33,7 @@ const ConversationView = () => {
     const setLoggedUser = () => {
         let user = localStorage.getItem('bng_user');
         let user_id: number | undefined;
-        if(user){
+        if (user) {
             user_id = JSON.parse(user)?.id;
         }
         setUserId(user_id)
@@ -43,7 +43,7 @@ const ConversationView = () => {
         setLoggedUser()
     }, [message])
 
-     return (
+    return (
         <div className="flex flex-col h-screen w-full bg-gray-50">
             {/* Header */}
             <div className="flex items-center justify-between p-4 bg-white border-b border-gray-300 shadow">
