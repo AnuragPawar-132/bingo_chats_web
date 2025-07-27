@@ -8,6 +8,8 @@ const ConversationView = () => {
     const [response, setResponse] = useState<any>("");
     const [userId, setUserId] = useState<any>("");
     const friend = useSelector((state: any) => state.chat.selectedFriend);
+    const [history, setHistory] = useState<any>([]);
+    const [sendMsgFlag, setSendMsgFlag] = useState<Boolean>(true);
 
     const ws = new WebSocket('ws://localhost:8080');
 
@@ -28,6 +30,7 @@ const ConversationView = () => {
             receiver_id: friend.id,
             message: message
         }));
+        setSendMsgFlag(!sendMsgFlag)
     }
 
     const setLoggedUser = () => {
@@ -39,9 +42,33 @@ const ConversationView = () => {
         setUserId(user_id)
     }
 
+    const getMessageHistory = async () => {
+        const token = localStorage.getItem("bng_token");
+        try {
+            const response = await fetch(`http://localhost:8080/cn/convs?senderId=${userId}&receiverId=${friend.id}`, {
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            const history = await response.json();
+            if (history.success) {
+                setHistory(history?.messages);
+            }
+            console.log("----------", history)
+        }
+        catch (err) {
+            console.log("err", err)
+        }
+    }
+
     useEffect(() => {
-        setLoggedUser()
+        setLoggedUser();
     }, [message])
+    useEffect(() => {
+        getMessageHistory();
+    }, [friend.id, response, sendMsgFlag])
 
     return (
         <div className="flex flex-col h-screen w-full bg-gray-50">
@@ -65,12 +92,19 @@ const ConversationView = () => {
 
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4">
-                <textarea
-                    className="w-full h-full resize-none bg-white p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    value={response.message}
-                    placeholder="Chat messages will appear here..."
-                    readOnly
-                ></textarea>
+                {
+                    history && history.map((item: any, ind: any) => {
+                        return (
+                            <textarea
+                                className="border-2 border-red-600  resize-none bg-white text-center rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                value={item.message}
+                                key={ind}
+                                placeholder="Chat messages will appear here..."
+                                readOnly
+                            ></textarea>
+                        )
+                    })
+                }
             </div>
 
             {/* Input Box */}
