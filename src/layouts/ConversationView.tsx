@@ -1,37 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MoreVertical } from "lucide-react";
 import { useSelector } from "react-redux";
 
 const ConversationView = () => {
 
+    const ws = useRef<WebSocket | null>(null);
     const [message, setMessage] = useState<string>('');
     const [response, setResponse] = useState<any>("");
     const [userId, setUserId] = useState<any>("");
     const friend = useSelector((state: any) => state.chat.selectedFriend);
     const [history, setHistory] = useState<any>([]);
     const [sendMsgFlag, setSendMsgFlag] = useState<Boolean>(true);
-
-    const ws = new WebSocket('ws://localhost:8080');
-
-    ws.onopen = () => {
-        ws.send(JSON.stringify({ type: 'register', user_id: userId }));
-    };
-
-    ws.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        setResponse(msg);
-        console.log('New message:', msg);
-    };
-
-    const sendMessage = () => {
-        console.log("in sendMessage fun");
-        ws.send(JSON.stringify({
-            sender_id: userId,
-            receiver_id: friend.id,
-            message: message
-        }));
-        setSendMsgFlag(!sendMsgFlag)
-    }
 
     const setLoggedUser = () => {
         let user = localStorage.getItem('bng_user');
@@ -56,7 +35,6 @@ const ConversationView = () => {
             if (history.success) {
                 setHistory(history?.messages);
             }
-            console.log("----------", history)
         }
         catch (err) {
             console.log("err", err)
@@ -69,6 +47,46 @@ const ConversationView = () => {
     useEffect(() => {
         getMessageHistory();
     }, [friend.id, response, sendMsgFlag])
+
+    // Setup WebSocket connection
+    useEffect(() => {
+        ws.current = new WebSocket('ws://localhost:8080');
+
+        ws.current.onopen = () => {
+            ws.current?.send(JSON.stringify({ type: 'register', user_id: userId }));
+        };
+
+        ws.current.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            setResponse(msg);
+        };
+
+        ws.current.onerror = (err) => {
+            console.error("WebSocket error:", err);
+        };
+
+        ws.current.onclose = () => {
+            console.log("WebSocket closed");
+        };
+
+        return () => {
+            ws.current?.close(); // Cleanup
+        };
+    }, [userId]);
+
+    const sendMessage = () => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({
+                sender_id: userId,
+                receiver_id: friend.id,
+                message: message,
+            }));
+            setSendMsgFlag(!sendMsgFlag);
+            setMessage("");
+        } else {
+            console.warn('WebSocket not connected');
+        }
+    };
 
     return (
         <div className="flex flex-col h-screen w-full bg-gray-50">
@@ -91,27 +109,34 @@ const ConversationView = () => {
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4">
-                {
-                    history && history.map((item: any, ind: any) => {
-                        return (
-                            <textarea
-                                className="border-2 border-red-600  resize-none bg-white text-center rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                value={item.message}
-                                key={ind}
-                                placeholder="Chat messages will appear here..."
-                                readOnly
-                            ></textarea>
-                        )
-                    })
-                }
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse gap-2">
+                {[...history].reverse().map((item: any, index: number) => {
+                    const isMe = item.senderId === userId;
+
+                    return (
+                        <div
+                            key={index}
+                            className={`max-w-[60%] px-3 py-2 rounded-lg shadow-sm border text-sm ${isMe
+                                ? 'self-end bg-green-100 text-right'
+                                : 'self-start bg-white text-left'
+                                }`}
+                        >
+                            <p className="text-gray-800">{item.message}</p>
+                            <p className="text-gray-400 text-xs mt-1">
+                                {item.timestamp}
+                            </p>
+                        </div>
+                    );
+                })}
             </div>
+
 
             {/* Input Box */}
             <div className="flex items-center p-3 bg-white border-t border-gray-300">
                 <input
                     className="flex-grow h-12 px-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                     type="text"
+                    value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Type your message here..."
                 />
