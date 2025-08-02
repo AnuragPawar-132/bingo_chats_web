@@ -1,7 +1,19 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login, logout } from '../slices/authSlice';
+
+interface LoginRequestBody{
+    email: string,
+    password: string
+}
+interface LoginResponse {
+    sucess: Boolean,
+    user:{
+        id: number,
+        username: string,
+        email: string
+    },
+    accessToken: string
+}
 
 const Login = () => {
 
@@ -11,14 +23,14 @@ const Login = () => {
 
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        let body = {
+        let body: LoginRequestBody = {
             email: email,
             password: password
         }
         requestLogin(body)
     }
 
-    const requestLogin = async (body: any) => {
+    const requestLogin = async (body: LoginRequestBody) => {
         try {
             const response = await fetch('http://localhost:8080/auth/login', {
                 method: 'POST',
@@ -31,7 +43,7 @@ const Login = () => {
                 console.log("HTTP Error:", response.status);
                 return;
             }
-            const result = await response.json();
+            const result: LoginResponse = await response.json();
             localStorage.setItem("bng_user",JSON.stringify(result.user));
             localStorage.setItem("bng_token",result.accessToken);
             navigate('/chat')
