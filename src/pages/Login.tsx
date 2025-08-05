@@ -69,7 +69,6 @@ const Login = () => {
                             onChange={(e)=>setEmail(e.target.value)}
                         />
                     </div>
-
                     <div>
                         <label className="block text-gray-700 font-medium mb-2">Password</label>
                         <input
@@ -80,7 +79,6 @@ const Login = () => {
                             onChange={(e)=>setPassword(e.target.value)}
                         />
                     </div>
-
                     <button
                         type="submit"
                         className="w-full bg-green-500 text-white font-semibold py-2 rounded-lg hover:bg-green-600 transition"
