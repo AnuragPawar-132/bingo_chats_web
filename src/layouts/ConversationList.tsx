@@ -2,12 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { chooseFriend } from '../slices/chatSlice';
 import { Search, MoreVertical } from 'lucide-react';
-import {
-  Menu,
-  MenuButton,
-  MenuItems,
-  MenuItem,
-} from "@headlessui/react";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import { get, post } from '../services/api';
 
 const ConversationList = () => {
 
@@ -22,23 +18,13 @@ const ConversationList = () => {
   };
 
   const fetchUsers = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/users", {
-        method: "GET",
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      if (!response.ok) {
-        console.log("HTTP Error:", response.status);
-        return;
-      }
-      const result = await response.json();
-      setUsers(result);
-    } catch (err) {
-      console.log('error in fetching users', err);
+    const api = "http://localhost:8080/api/users";
+    let headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     }
+    let result = await get(api, headers)
+    setUsers(result);
   }
 
   const selectFriend = (friend: any) => {
