@@ -19,9 +19,9 @@ const get = async (api: string, headers: any) => {
 const post = async (api: string, headers: any, body: any) => {
     try {
         let response = await fetch(api, {
-            headers,
+            headers: headers,
             method: "POST",
-            body
+            body: JSON.stringify(body)
         })
         if (!response.ok) {
             console.log("HTTP Error:", response.status);

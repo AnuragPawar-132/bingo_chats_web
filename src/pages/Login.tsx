@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { post } from '../services/api';
 
-interface LoginRequestBody{
+interface LoginRequestBody {
     email: string,
     password: string
 }
 interface LoginResponse {
     sucess: Boolean,
-    user:{
+    user: {
         id: number,
         username: string,
         email: string
@@ -31,26 +32,13 @@ const Login = () => {
     }
 
     const requestLogin = async (body: LoginRequestBody) => {
-        try {
-            const response = await fetch('http://localhost:8080/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(body),
-            })
-            if (!response.ok) {
-                console.log("HTTP Error:", response.status);
-                return;
-            }
-            const result: LoginResponse = await response.json();
-            localStorage.setItem("bng_user",JSON.stringify(result.user));
-            localStorage.setItem("bng_token",result.accessToken);
-            navigate('/chat')
-        }
-        catch (err) {
-            console.log("err", err);
-        }
+
+        const API = "http://localhost:8080/auth/login";
+        const headers = { 'Content-Type': 'application/json' }
+        let result: LoginResponse = await post(API, headers, body);
+        localStorage.setItem("bng_user", JSON.stringify(result.user));
+        localStorage.setItem("bng_token", result.accessToken);
+        navigate('/chat')
     }
 
     return (
@@ -66,7 +54,7 @@ const Login = () => {
                             className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter your email"
                             required
-                            onChange={(e)=>setEmail(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     <div>
@@ -76,7 +64,7 @@ const Login = () => {
                             className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter your password"
                             required
-                            onChange={(e)=>setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
                     <button

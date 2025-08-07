@@ -3,11 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { chooseFriend } from '../slices/chatSlice';
 import { Search, MoreVertical } from 'lucide-react';
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
-import { get, post } from '../services/api';
+import { get } from '../services/api';
 
 const ConversationList = () => {
 
-  const myUser = useSelector((state: any) => state.auth.loggedUser);
   const dispatch = useDispatch();
   const token = localStorage.getItem("bng_token");
   const [users, setUsers] = useState<any>([]);
