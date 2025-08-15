@@ -7,24 +7,17 @@ const ConversationView = () => {
     const ws = useRef<WebSocket | null>(null);
     const [message, setMessage] = useState<string>('');
     const [response, setResponse] = useState<any>("");
-    const [userId, setUserId] = useState<any>("");
+    const user = useSelector((state: any) => state.auth.loggedUser);
     const friend = useSelector((state: any) => state.chat.selectedFriend);
     const [history, setHistory] = useState<any>([]);
     const [sendMsgFlag, setSendMsgFlag] = useState<Boolean>(true);
 
-    const setLoggedUser = () => {
-        let user = localStorage.getItem('bng_user');
-        let user_id: number | undefined;
-        if (user) {
-            user_id = JSON.parse(user)?.id;
-        }
-        setUserId(user_id)
-    }
+
 
     const getMessageHistory = async () => {
         const token = localStorage.getItem("bng_token");
         try {
-            const response = await fetch(`http://localhost:8080/cn/convs?senderId=${userId}&receiverId=${friend.id}`, {
+            const response = await fetch(`http://localhost:8080/cn/convs?senderId=${user.id}&receiverId=${friend.id}`, {
                 method: "GET",
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -42,9 +35,6 @@ const ConversationView = () => {
     }
 
     useEffect(() => {
-        setLoggedUser();
-    }, [message])
-    useEffect(() => {
         getMessageHistory();
     }, [friend.id, response, sendMsgFlag])
 
@@ -53,7 +43,7 @@ const ConversationView = () => {
         ws.current = new WebSocket('ws://localhost:8080');
 
         ws.current.onopen = () => {
-            ws.current?.send(JSON.stringify({ type: 'register', user_id: userId }));
+            ws.current?.send(JSON.stringify({ type: 'register', user_id: user.id }));
         };
 
         ws.current.onmessage = (event) => {
@@ -70,14 +60,15 @@ const ConversationView = () => {
         };
 
         return () => {
+            console.log("websocket cleanup")
             ws.current?.close(); // Cleanup
         };
-    }, [userId]);
+    }, [user.id]);
 
     const sendMessage = () => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({
-                sender_id: userId,
+                sender_id: user.id,
                 receiver_id: friend.id,
                 message: message,
             }));
@@ -111,7 +102,7 @@ const ConversationView = () => {
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse gap-2">
                 {[...history].reverse().map((item: any, index: number) => {
-                    const isMe = item.senderId === userId;
+                    const isMe = item.senderId === user.id;
 
                     return (
                         <div

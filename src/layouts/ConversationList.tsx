@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { chooseFriend } from '../slices/chatSlice';
 import { Search, MoreVertical } from 'lucide-react';
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
@@ -23,7 +23,7 @@ const ConversationList = () => {
       'Content-Type': 'application/json'
     }
     let result = await get(api, headers)
-    setUsers(result);
+    setUsers(result.users);
   }
 
   const selectFriend = (friend: any) => {
@@ -31,7 +31,9 @@ const ConversationList = () => {
   }
 
   useEffect(() => {
-    fetchUsers()
+    fetchUsers();
+    console.log("users", users);
+
   }, [])
 
   return (
@@ -74,7 +76,7 @@ const ConversationList = () => {
 
       {/* Chat List */}
       <div className="flex-1 overflow-y-auto">
-        {users.map((conv: any) => (
+        {users.length > 0 && users?.map((conv: any) => (
           <div
             key={conv.id}
             onClick={() => selectFriend(conv)}

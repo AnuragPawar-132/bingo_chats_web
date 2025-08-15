@@ -1,10 +1,4 @@
-import {
-  MessageSquareText ,
-  Radar,
-  MessageCircle,
-  Users,
-  Settings,
-} from "lucide-react";
+import { MessageSquareText , Radar, MessageCircle, Users, Settings } from "lucide-react";
 import { useSelector } from "react-redux";
 
 export default function VerticalSidebar() {
